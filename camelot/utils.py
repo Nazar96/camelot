@@ -12,6 +12,10 @@ import warnings
 from itertools import groupby
 from operator import itemgetter
 
+from layout import PageObj, AttrDict
+# from sberocr import sberocr
+import matplotlib.pyplot as plt
+
 import numpy as np
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
@@ -644,9 +648,7 @@ def get_table_index(
     """
     r_idx, c_idx = [-1] * 2
     for r in range(len(table.rows)):
-        if (t.y0 + t.y1) / 2.0 < table.rows[r][0] and (t.y0 + t.y1) / 2.0 > table.rows[
-            r
-        ][1]:
+        if (t.y0 + t.y1) / 2.0 < table.rows[r][0] and (t.y0 + t.y1) / 2.0 > table.rows[r][1]:
             lt_col_overlap = []
             for c in table.cols:
                 if c[0] <= t.x1 and c[1] >= t.x0:
@@ -814,6 +816,62 @@ def get_page_layout(
         return layout, dim
 
 
+def get_ocr_layout(
+    filename,
+    char_margin=1.0,
+    line_margin=0.5,
+    word_margin=0.1,
+    detect_vertical=True,
+    all_texts=True,
+):
+    """
+    Return an image layout
+    Returns a PDFMiner LTPage object and page dimension of a single
+    page pdf. See https://euske.github.io/pdfminer/ to get definitions
+    of kwargs.
+
+    Parameters
+    ----------
+    filename : string
+        Path to pdf file.
+    char_margin : float
+    line_margin : float
+    word_margin : float
+    detect_vertical : bool
+    all_texts : bool
+
+    Returns
+    -------
+    layout : object
+        PDFMiner LTPage object.
+    dim : tuple
+        Dimension of pdf page in the form (width, height).
+
+    """
+
+    def bbox_text(ocr_res):
+        result = AttrDict()
+        result['_objs'] = []
+        for level_1 in ocr_res.items:
+            for level_2 in level_1:
+                for level_3 in level_2:
+                    word = {}
+                    bbox = level_3.bbox.tolist()
+                    word['x0'] = bbox[0][0]
+                    word['x1'] = bbox[1][0]
+                    word['y0'] = bbox[0][1]
+                    word['y1'] = bbox[2][0]
+                    word['text'] = level_3.text
+                    word_obj = PageObj(**word)
+                    result._objs.apped(word_obj)
+        return result
+
+    # layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
+    height, width, _ = plt.imread(filename).shape
+    dim = (width, height)
+    return layout, dim
+
+
 def get_text_objects(layout, ltype="char", t=None):
     """Recursively parses pdf layout to get a list of
     PDFMiner text objects.
@@ -852,3 +910,35 @@ def get_text_objects(layout, ltype="char", t=None):
     except AttributeError:
         pass
     return t
+
+
+def get_ocr_objects(layout, ltype="char", t=None):
+    """Recursively parses pdf layout to get a list of
+    PDFMiner text objects.
+
+    Parameters
+    ----------
+    layout : object
+        PDFMiner LTPage object.
+    ltype : string
+        Specify 'char', 'lh', 'lv' to get LTChar, LTTextLineHorizontal,
+        and LTTextLineVertical objects respectively.
+    t : list
+
+    Returns
+    -------
+    t : list
+        List of PDFMiner text objects.
+
+    """
+
+    # if ltype == "char":
+    #     LTObject = LTChar
+    # elif ltype == "image":
+    #     LTObject = LTImage
+    # elif ltype == "horizontal_text":
+    #     LTObject = LTTextLineHorizontal
+    # elif ltype == "vertical_text":
+    #     LTObject = LTTextLineVertical
+
+    return layout

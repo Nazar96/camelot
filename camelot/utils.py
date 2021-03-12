@@ -16,21 +16,21 @@ from .layout import PageObj, AttrDict
 import matplotlib.pyplot as plt
 
 import numpy as np
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfpage import PDFTextExtractionNotAllowed
-from pdfminer.pdfinterp import PDFResourceManager
-from pdfminer.pdfinterp import PDFPageInterpreter
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import (
-    LAParams,
-    LTAnno,
-    LTChar,
-    LTTextLineHorizontal,
-    LTTextLineVertical,
-    LTImage,
-)
+# from pdfminer.pdfparser import PDFParser
+# from pdfminer.pdfdocument import PDFDocument
+# from pdfminer.pdfpage import PDFPage
+# from pdfminer.pdfpage import PDFTextExtractionNotAllowed
+# from pdfminer.pdfinterp import PDFResourceManager
+# from pdfminer.pdfinterp import PDFPageInterpreter
+# from pdfminer.converter import PDFPageAggregator
+# from pdfminer.layout import (
+#     LAParams,
+#     LTAnno,
+#     LTChar,
+#     LTTextLineHorizontal,
+#     LTTextLineVertical,
+#     LTImage,
+# )
 
 PY3 = sys.version_info[0] >= 3
 if PY3:
@@ -861,57 +861,54 @@ def get_ocr_layout(
                     word['y1'] = bbox[2][0]
                     word['text'] = level_3.text
                     word_obj = PageObj(**word)
-                    result._objs.append(word_obj)
+                    result['_objs'].append(word_obj)
         return result
 
-    # layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
-    import pickle
-    from .layout import PageObj, AttrDict
-    with open('./example.pkl', 'rb') as f:
-        layout = pickle.load(f)
+    from sberocr import sberocr
+    layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
     height, width, _ = plt.imread(filename).shape
     dim = (width, height)
     return layout, dim
-
-
-def get_text_objects(layout, ltype="char", t=None):
-    """Recursively parses pdf layout to get a list of
-    PDFMiner text objects.
-
-    Parameters
-    ----------
-    layout : object
-        PDFMiner LTPage object.
-    ltype : string
-        Specify 'char', 'lh', 'lv' to get LTChar, LTTextLineHorizontal,
-        and LTTextLineVertical objects respectively.
-    t : list
-
-    Returns
-    -------
-    t : list
-        List of PDFMiner text objects.
-
-    """
-    if ltype == "char":
-        LTObject = LTChar
-    elif ltype == "image":
-        LTObject = LTImage
-    elif ltype == "horizontal_text":
-        LTObject = LTTextLineHorizontal
-    elif ltype == "vertical_text":
-        LTObject = LTTextLineVertical
-    if t is None:
-        t = []
-    try:
-        for obj in layout._objs:
-            if isinstance(obj, LTObject):
-                t.append(obj)
-            else:
-                t += get_text_objects(obj, ltype=ltype)
-    except AttributeError:
-        pass
-    return t
+#
+#
+# def get_text_objects(layout, ltype="char", t=None):
+#     """Recursively parses pdf layout to get a list of
+#     PDFMiner text objects.
+#
+#     Parameters
+#     ----------
+#     layout : object
+#         PDFMiner LTPage object.
+#     ltype : string
+#         Specify 'char', 'lh', 'lv' to get LTChar, LTTextLineHorizontal,
+#         and LTTextLineVertical objects respectively.
+#     t : list
+#
+#     Returns
+#     -------
+#     t : list
+#         List of PDFMiner text objects.
+#
+#     """
+#     if ltype == "char":
+#         LTObject = LTChar
+#     elif ltype == "image":
+#         LTObject = LTImage
+#     elif ltype == "horizontal_text":
+#         LTObject = LTTextLineHorizontal
+#     elif ltype == "vertical_text":
+#         LTObject = LTTextLineVertical
+#     if t is None:
+#         t = []
+#     try:
+#         for obj in layout._objs:
+#             if isinstance(obj, LTObject):
+#                 t.append(obj)
+#             else:
+#                 t += get_text_objects(obj, ltype=ltype)
+#     except AttributeError:
+#         pass
+#     return t
 
 
 def get_ocr_objects(layout, ltype="char", t=None):

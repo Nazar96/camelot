@@ -208,18 +208,23 @@ class Lattice(BaseParser):
                                 t.cells[i][j].text = t.cells[i - 1][j].text
         return t
 
-    def _generate_image(self):
-        from ..ext.ghostscript import Ghostscript
+    # def _generate_image(self):
+    #     from ..ext.ghostscript import Ghostscript
+    #
+    #     self.imagename = "".join([self.rootname, ".png"])
+    #     gs_call = "-q -sDEVICE=png16m -o {} -r300 {}".format(
+    #         self.imagename, self.filename
+    #     )
+    #     gs_call = gs_call.encode().split()
+    #     null = open(os.devnull, "wb")
+    #     with Ghostscript(*gs_call, stdout=null) as gs:
+    #         pass
+    #     null.close()
 
-        self.imagename = "".join([self.rootname, ".png"])
-        gs_call = "-q -sDEVICE=png16m -o {} -r300 {}".format(
-            self.imagename, self.filename
-        )
-        gs_call = gs_call.encode().split()
-        null = open(os.devnull, "wb")
-        with Ghostscript(*gs_call, stdout=null) as gs:
-            pass
-        null.close()
+
+    def _generate_image(self):
+        self.imagename = self.filename
+
 
     def _generate_table_bbox(self):
         def scale_areas(areas):
@@ -302,10 +307,10 @@ class Lattice(BaseParser):
             tk, self.vertical_segments, self.horizontal_segments
         )
         t_bbox["horizontal"] = text_in_bbox(tk, self.horizontal_text)
-        t_bbox["vertical"] = text_in_bbox(tk, self.vertical_text)
+        # t_bbox["vertical"] = text_in_bbox(tk, self.vertical_text)
 
         t_bbox["horizontal"].sort(key=lambda x: (-x.y0, x.x0))
-        t_bbox["vertical"].sort(key=lambda x: (x.x0, -x.y0))
+        # t_bbox["vertical"].sort(key=lambda x: (x.x0, -x.y0))
 
         self.t_bbox = t_bbox
 
@@ -339,7 +344,8 @@ class Lattice(BaseParser):
         pos_errors = []
         # TODO: have a single list in place of two directional ones?
         # sorted on x-coordinate based on reading order i.e. LTR or RTL
-        for direction in ["vertical", "horizontal"]:
+        # for direction in ["vertical", "horizontal"]:
+        for direction in ["horizontal"]:
             for t in self.t_bbox[direction]:
                 indices, error = get_table_index(
                     table,
@@ -370,12 +376,12 @@ class Lattice(BaseParser):
         table.accuracy = accuracy
         table.whitespace = whitespace
         table.order = table_idx + 1
-        table.page = int(os.path.basename(self.rootname).replace("page-", ""))
+        # table.page = int(os.path.basename(self.rootname).replace("page-", ""))
 
         # for plotting
         _text = []
         _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.horizontal_text])
-        _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.vertical_text])
+        # _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.vertical_text])
         table._text = _text
         table._image = (self.image, self.table_bbox_unscaled)
         table._segments = (self.vertical_segments, self.horizontal_segments)
@@ -388,17 +394,17 @@ class Lattice(BaseParser):
         if not suppress_stdout:
             logger.info("Processing {}".format(os.path.basename(self.rootname)))
 
-        if not self.horizontal_text:
-            if self.images:
-                warnings.warn(
-                    "{} is image-based, camelot only works on"
-                    " text-based pages.".format(os.path.basename(self.rootname))
-                )
-            else:
-                warnings.warn(
-                    "No tables found on {}".format(os.path.basename(self.rootname))
-                )
-            return []
+        # if not self.horizontal_text:
+        #     if self.images:
+        #         warnings.warn(
+        #             "{} is image-based, camelot only works on"
+        #             " text-based pages.".format(os.path.basename(self.rootname))
+        #         )
+        #     else:
+        #         warnings.warn(
+        #             "No tables found on {}".format(os.path.basename(self.rootname))
+        #         )
+        #     return []
 
         self._generate_image()
         self._generate_table_bbox()

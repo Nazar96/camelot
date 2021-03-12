@@ -12,8 +12,7 @@ import warnings
 from itertools import groupby
 from operator import itemgetter
 
-from layout import PageObj, AttrDict
-# from sberocr import sberocr
+from .layout import PageObj, AttrDict
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -32,7 +31,6 @@ from pdfminer.layout import (
     LTTextLineVertical,
     LTImage,
 )
-
 
 PY3 = sys.version_info[0] >= 3
 if PY3:
@@ -863,10 +861,14 @@ def get_ocr_layout(
                     word['y1'] = bbox[2][0]
                     word['text'] = level_3.text
                     word_obj = PageObj(**word)
-                    result._objs.apped(word_obj)
+                    result._objs.append(word_obj)
         return result
 
     # layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
+    import pickle
+    from .layout import PageObj, AttrDict
+    with open('./example.pkl', 'rb') as f:
+        layout = pickle.load(f)
     height, width, _ = plt.imread(filename).shape
     dim = (width, height)
     return layout, dim
@@ -941,4 +943,4 @@ def get_ocr_objects(layout, ltype="char", t=None):
     # elif ltype == "vertical_text":
     #     LTObject = LTTextLineVertical
 
-    return layout
+    return layout._objs

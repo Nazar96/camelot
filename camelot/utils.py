@@ -458,13 +458,13 @@ def flag_font_size(textline, direction, strip_text=""):
         d = [
             (t.get_text(), np.round(t.height, decimals=6))
             for t in textline
-            if not isinstance(t, LTAnno)
+            # if not isinstance(t, LTAnno)
         ]
     elif direction == "vertical":
         d = [
             (t.get_text(), np.round(t.width, decimals=6))
             for t in textline
-            if not isinstance(t, LTAnno)
+            # if not isinstance(t, LTAnno)
         ]
     l = [np.round(size, decimals=6) for text, size in d]
     if len(set(l)) > 1:
@@ -759,59 +759,59 @@ def compute_whitespace(d):
     whitespace = 100 * (whitespace / float(len(d) * len(d[0])))
     return whitespace
 
-
-def get_page_layout(
-    filename,
-    char_margin=1.0,
-    line_margin=0.5,
-    word_margin=0.1,
-    detect_vertical=True,
-    all_texts=True,
-):
-    """Returns a PDFMiner LTPage object and page dimension of a single
-    page pdf. See https://euske.github.io/pdfminer/ to get definitions
-    of kwargs.
-
-    Parameters
-    ----------
-    filename : string
-        Path to pdf file.
-    char_margin : float
-    line_margin : float
-    word_margin : float
-    detect_vertical : bool
-    all_texts : bool
-
-    Returns
-    -------
-    layout : object
-        PDFMiner LTPage object.
-    dim : tuple
-        Dimension of pdf page in the form (width, height).
-
-    """
-    with open(filename, "rb") as f:
-        parser = PDFParser(f)
-        document = PDFDocument(parser)
-        if not document.is_extractable:
-            raise PDFTextExtractionNotAllowed
-        laparams = LAParams(
-            char_margin=char_margin,
-            line_margin=line_margin,
-            word_margin=word_margin,
-            detect_vertical=detect_vertical,
-            all_texts=all_texts,
-        )
-        rsrcmgr = PDFResourceManager()
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
-        for page in PDFPage.create_pages(document):
-            interpreter.process_page(page)
-            layout = device.get_result()
-            width = layout.bbox[2]
-            height = layout.bbox[3]
-            dim = (width, height)
-        return layout, dim
+#
+# def get_page_layout(
+#     filename,
+#     char_margin=1.0,
+#     line_margin=0.5,
+#     word_margin=0.1,
+#     detect_vertical=True,
+#     all_texts=True,
+# ):
+#     """Returns a PDFMiner LTPage object and page dimension of a single
+#     page pdf. See https://euske.github.io/pdfminer/ to get definitions
+#     of kwargs.
+#
+#     Parameters
+#     ----------
+#     filename : string
+#         Path to pdf file.
+#     char_margin : float
+#     line_margin : float
+#     word_margin : float
+#     detect_vertical : bool
+#     all_texts : bool
+#
+#     Returns
+#     -------
+#     layout : object
+#         PDFMiner LTPage object.
+#     dim : tuple
+#         Dimension of pdf page in the form (width, height).
+#
+#     """
+#     with open(filename, "rb") as f:
+#         parser = PDFParser(f)
+#         document = PDFDocument(parser)
+#         if not document.is_extractable:
+#             raise PDFTextExtractionNotAllowed
+#         laparams = LAParams(
+#             char_margin=char_margin,
+#             line_margin=line_margin,
+#             word_margin=word_margin,
+#             detect_vertical=detect_vertical,
+#             all_texts=all_texts,
+#         )
+#         rsrcmgr = PDFResourceManager()
+#         device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+#         interpreter = PDFPageInterpreter(rsrcmgr, device)
+#         for page in PDFPage.create_pages(document):
+#             interpreter.process_page(page)
+#             layout = device.get_result()
+#             width = layout.bbox[2]
+#             height = layout.bbox[3]
+#             dim = (width, height)
+#         return layout, dim
 
 
 def get_ocr_layout(
@@ -861,7 +861,7 @@ def get_ocr_layout(
                     word['x1'] = bbox[1][0]
                     word['y0'] = height - bbox[0][1]
                     word['y1'] = height - bbox[2][1]
-                    word['text'] = level_3.text
+                    word['text'] = level_3.text+' '
                     word_obj = PageObj(**word)
                     result['_objs'].append(word_obj)
         return result

@@ -2,7 +2,7 @@
 
 import os
 
-from ..utils import get_ocr_objects, get_ocr_layout, get_ocr_objects
+from ..utils import get_ocr_layout, get_ocr_objects
 
 
 class BaseParser(object):

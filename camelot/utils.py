@@ -847,6 +847,8 @@ def get_ocr_layout(
 
     """
 
+    height, width, _ = plt.imread(filename).shape
+
     def bbox_text(ocr_res):
         result = AttrDict()
         result['_objs'] = []
@@ -857,8 +859,8 @@ def get_ocr_layout(
                     bbox = level_3.bbox.tolist()
                     word['x0'] = bbox[0][0]
                     word['x1'] = bbox[1][0]
-                    word['y0'] = bbox[0][1]
-                    word['y1'] = bbox[2][0]
+                    word['y0'] = height - bbox[0][1]
+                    word['y1'] = height - bbox[2][1]
                     word['text'] = level_3.text
                     word_obj = PageObj(**word)
                     result['_objs'].append(word_obj)
@@ -866,7 +868,6 @@ def get_ocr_layout(
 
     from sberocr import sberocr
     layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
-    height, width, _ = plt.imread(filename).shape
     dim = (width, height)
     return layout, dim
 #

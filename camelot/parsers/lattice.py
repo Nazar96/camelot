@@ -309,7 +309,8 @@ class Lattice(BaseParser):
         t_bbox["horizontal"] = text_in_bbox(tk, self.horizontal_text)
         # t_bbox["vertical"] = text_in_bbox(tk, self.vertical_text)
 
-        t_bbox["horizontal"].sort(key=lambda x: (-x.y0, x.x0))
+        # Here bug with cell's words order
+        # t_bbox["horizontal"].sort(key=lambda x: (-x.y0, x.x0))
         # t_bbox["vertical"].sort(key=lambda x: (x.x0, -x.y0))
 
         self.t_bbox = t_bbox

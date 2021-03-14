@@ -321,10 +321,10 @@ class Stream(BaseParser):
         # select elements which lie within table_bbox
         t_bbox = {}
         t_bbox["horizontal"] = text_in_bbox(tk, self.horizontal_text)
-        t_bbox["vertical"] = text_in_bbox(tk, self.vertical_text)
+        # t_bbox["vertical"] = text_in_bbox(tk, self.vertical_text)
 
         t_bbox["horizontal"].sort(key=lambda x: (-x.y0, x.x0))
-        t_bbox["vertical"].sort(key=lambda x: (x.x0, -x.y0))
+        # t_bbox["vertical"].sort(key=lambda x: (x.x0, -x.y0))
 
         self.t_bbox = t_bbox
 
@@ -393,7 +393,8 @@ class Stream(BaseParser):
         pos_errors = []
         # TODO: have a single list in place of two directional ones?
         # sorted on x-coordinate based on reading order i.e. LTR or RTL
-        for direction in ["vertical", "horizontal"]:
+        # for direction in ["vertical", "horizontal"]:
+        for direction in ["horizontal"]:
             for t in self.t_bbox[direction]:
                 indices, error = get_table_index(
                     table,
@@ -418,12 +419,12 @@ class Stream(BaseParser):
         table.accuracy = accuracy
         table.whitespace = whitespace
         table.order = table_idx + 1
-        table.page = int(os.path.basename(self.rootname).replace("page-", ""))
+        # table.page = int(os.path.basename(self.rootname).replace("page-", ""))
 
         # for plotting
         _text = []
         _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.horizontal_text])
-        _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.vertical_text])
+        # _text.extend([(t.x0, t.y0, t.x1, t.y1) for t in self.vertical_text])
         table._text = _text
         table._image = None
         table._segments = None
@@ -436,17 +437,17 @@ class Stream(BaseParser):
         if not suppress_stdout:
             logger.info("Processing {}".format(os.path.basename(self.rootname)))
 
-        if not self.horizontal_text:
-            if self.images:
-                warnings.warn(
-                    "{} is image-based, camelot only works on"
-                    " text-based pages.".format(os.path.basename(self.rootname))
-                )
-            else:
-                warnings.warn(
-                    "No tables found on {}".format(os.path.basename(self.rootname))
-                )
-            return []
+        # if not self.horizontal_text:
+        #     if self.images:
+        #         warnings.warn(
+        #             "{} is image-based, camelot only works on"
+        #             " text-based pages.".format(os.path.basename(self.rootname))
+        #         )
+        #     else:
+        #         warnings.warn(
+        #             "No tables found on {}".format(os.path.basename(self.rootname))
+        #         )
+        #     return []
 
         self._generate_table_bbox()
 

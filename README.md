@@ -1,19 +1,18 @@
 
 >>> from camelot.camelot.parsers.lattice import Lattice
-# from camelot.camelot.parsers.stream import Stream
+>>> from camelot.camelot import plot
+>>> 
 >>> parser = Lattice()
-# parser = Stream()
-
 >>> res = parser.extract_tables(img_path)
 >>> print(len(res))
-
->>> from camelot.camelot import plot
+>>> 
 >>> try:
 >>>   fig = plot(res[0], kind='joint')
 >>>   fig.set_size_inches(15,15)
 >>>   fig.show()
 >>> except:
 >>>   pass
+>>>   
 >>> for t in res:
 >>>   print(t.parsing_report)
 >>>   fig = plot(t, kind='grid')

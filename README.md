@@ -1,4 +1,4 @@
-
+<pre>
 >>> from camelot.camelot.parsers.lattice import Lattice
 >>> from camelot.camelot import plot
 >>> 
@@ -19,6 +19,7 @@
 >>>   fig.set_size_inches(15,15)
 >>>   fig.show()
 >>>   display(t.df)
+</pre>
 
 
 <p align="center">

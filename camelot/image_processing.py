@@ -6,13 +6,12 @@ import cv2
 import numpy as np
 
 
-def adaptive_threshold(imagename, process_background=False, blocksize=15, c=-2):
+def adaptive_threshold(img, process_background=False, blocksize=15, c=-2):
     """Thresholds an image using OpenCV's adaptiveThreshold.
 
     Parameters
     ----------
-    imagename : string
-        Path to image file.
+    img : np.array
     process_background : bool, optional (default: False)
         Whether or not to process lines that are in background.
     blocksize : int, optional (default: 15)
@@ -34,7 +33,6 @@ def adaptive_threshold(imagename, process_background=False, blocksize=15, c=-2):
         numpy.ndarray representing the thresholded image.
 
     """
-    img = cv2.imread(imagename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     if process_background:

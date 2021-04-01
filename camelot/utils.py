@@ -815,7 +815,7 @@ def compute_whitespace(d):
 
 
 def get_ocr_layout(
-    filename,
+    img,
     char_margin=1.0,
     line_margin=0.5,
     word_margin=0.1,
@@ -830,8 +830,7 @@ def get_ocr_layout(
 
     Parameters
     ----------
-    filename : string
-        Path to pdf file.
+    filename : np.array
     char_margin : float
     line_margin : float
     word_margin : float
@@ -847,7 +846,7 @@ def get_ocr_layout(
 
     """
 
-    height, width, _ = plt.imread(filename).shape
+    height, width, _ = img.shape
 
     def bbox_text(ocr_res):
         result = AttrDict()
@@ -867,7 +866,7 @@ def get_ocr_layout(
         return result
 
     from sberocr import sberocr
-    layout = bbox_text(sberocr.SberOCR().images_to_text([filename])[0])
+    layout = bbox_text(sberocr.SberOCR().images_to_text([img])[0])
     dim = (width, height)
     return layout, dim
 #

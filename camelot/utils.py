@@ -821,6 +821,7 @@ def get_ocr_layout(
     word_margin=0.1,
     detect_vertical=True,
     all_texts=True,
+    run_ocr=True,
 ):
     """
     Return an image layout
@@ -830,7 +831,7 @@ def get_ocr_layout(
 
     Parameters
     ----------
-    filename : np.array
+    img : np.array
     char_margin : float
     line_margin : float
     word_margin : float
@@ -865,8 +866,12 @@ def get_ocr_layout(
                     result['_objs'].append(word_obj)
         return result
 
-    from sberocr import sberocr
-    layout = bbox_text(sberocr.SberOCR().images_to_text([img])[0])
+    if run_ocr:
+        from sberocr import sberocr
+        layout = bbox_text(sberocr.SberOCR().images_to_text([img])[0])
+    else:
+        layout = AttrDict()
+        layout['_objs'] = []
     dim = (width, height)
     return layout, dim
 #

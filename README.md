@@ -1,9 +1,11 @@
 <pre>
 >>> from camelot.camelot.parsers.lattice import Lattice
 >>> from camelot.camelot import plot
+>>> import cv2
 >>> 
+>>> img = cv2.imread(img_path)
 >>> parser = Lattice()
->>> res = parser.extract_tables(img_path)
+>>> res = parser.extract_tables(img, run_ocr=True)
 >>> print(len(res))
 >>> 
 >>> try:

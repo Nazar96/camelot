@@ -6,7 +6,6 @@
 >>> img = cv2.imread(img_path)
 >>> parser = Lattice()
 >>> res = parser.extract_tables(img, run_ocr=True)
->>> print(len(res))
 >>> 
 >>> try:
 >>>   fig = plot(res[0], kind='joint')

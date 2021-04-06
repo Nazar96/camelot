@@ -1046,7 +1046,7 @@ def draw_lines(image, table, linewidth=5, alpha=0.5):
             if cell.bottom:
                 ax.plot([cell.lb[0], cell.rb[0]], [cell.lb[1], cell.rb[1]], linewidth=linewidth, alpha=alpha)
     plt.imshow(image[::-1], origin='lower')
-    plt.show()
+    return fig
 
 
 def draw_cells(image, conn_comp_bbox, linewidth=5, alpha=0.5):
@@ -1059,4 +1059,4 @@ def draw_cells(image, conn_comp_bbox, linewidth=5, alpha=0.5):
         ax.plot([conn.x1, conn.x2], [conn.y1, conn.y1], linewidth=linewidth, alpha=alpha)
 
     plt.imshow(image[::-1], origin='lower')
-    plt.show()
+    return fig

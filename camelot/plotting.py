@@ -221,33 +221,3 @@ class PlotMethods(object):
         for h in horizontal:
             ax.plot([h[0], h[2]], [h[1], h[3]])
         return fig
-
-
-def draw_lines(image, table, linewidth=5, alpha=0.5):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    for row in table.cells:
-        for cell in row:
-            if cell.left:
-                ax.plot([cell.lb[0], cell.lt[0]], [cell.lb[1], cell.lt[1]], linewidth=linewidth, alpha=alpha)
-            if cell.right:
-                ax.plot([cell.rb[0], cell.rt[0]], [cell.rb[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
-            if cell.top:
-                ax.plot([cell.lt[0], cell.rt[0]], [cell.lt[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
-            if cell.bottom:
-                ax.plot([cell.lb[0], cell.rb[0]], [cell.lb[1], cell.rb[1]], linewidth=linewidth, alpha=alpha)
-    plt.imshow(image[::-1], origin='lower')
-    plt.show()
-
-
-def draw_cells(image, conn_comp_bbox, linewidth=5, alpha=0.5):
-    fig = plt.figure(figsize=(15, 15))
-    ax = fig.add_subplot(111)
-    for conn in conn_comp_bbox:
-        ax.plot([conn.x2, conn.x2], [conn.y1, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x1], [conn.y1, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x2], [conn.y2, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x2], [conn.y1, conn.y1], linewidth=linewidth, alpha=alpha)
-
-    plt.imshow(image[::-1], origin='lower')
-    plt.show()

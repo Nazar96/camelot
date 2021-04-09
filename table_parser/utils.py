@@ -970,7 +970,7 @@ def rotation_score(img, angle):
     return score
 
 
-def derotate_angle(img, left=-3, right=3, n_iter=5, resize_k=0.5):
+def derotate_angle(img, left=-3, right=3, n_iter=4, resize_k=0.3):
     h, w = img.shape[:2]
     tmp = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     tmp = cv2.resize(tmp, (int(w * resize_k), int(h * resize_k)), interpolation=cv2.INTER_AREA)
@@ -987,49 +987,6 @@ def derotate_angle(img, left=-3, right=3, n_iter=5, resize_k=0.5):
 
     best_angle = (left + right) / 2
     return best_angle
-
-
-def get_spans(table):
-    "Return table's connected components"
-    cells = table.cells
-
-    nodes_list = []
-    edges_list = []
-    for i, row in enumerate(cells):
-        for j, cell in enumerate(row):
-            nodes_list.append((i, j))
-            if cell.right is False:
-                edges_list.append(((i, j), (i, j + 1)))
-            if cell.left is False:
-                edges_list.append(((i, j), (i, j - 1)))
-            if cell.top is False:
-                edges_list.append(((i, j), (i - 1, j)))
-            if cell.bottom is False:
-                edges_list.append(((i, j), (i + 1, j)))
-
-    G = nx.Graph()
-    G.add_nodes_from(nodes_list)
-    G.add_edges_from(edges_list)
-    conn_comp_idx = list(nx.connected_components(G))
-
-    conn_comp_cells = []
-    for comp in conn_comp_idx:
-        tmp = []
-        for idx in comp:
-            tmp.append(cells[idx[0]][idx[1]])
-        conn_comp_cells.append(tmp)
-
-    conn_comp_bbox = []
-    for comp in conn_comp_cells:
-        x1 = min([cell.x1 for cell in comp])
-        x2 = max([cell.x2 for cell in comp])
-        y1 = min([cell.y1 for cell in comp])
-        y2 = min([cell.y2 for cell in comp])
-        bbox = {
-            'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2,
-        }
-        conn_comp_bbox.append(AttrDict(bbox))
-    return conn_comp_bbox
 
 
 def draw_lines(image, table, linewidth=5, alpha=0.5):
@@ -1049,11 +1006,12 @@ def draw_lines(image, table, linewidth=5, alpha=0.5):
     return fig
 
 
-def draw_cells(image, span_list, linewidth=5, alpha=0.5):
+def draw_cells(image, span_list, linewidth=5, alpha=0.5, color=None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     for span in span_list:
-        color = np.random.rand(3)
+        if color is None:
+            color = np.random.rand(3)
         ax.plot([span.x2, span.x2], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
         ax.plot([span.x1, span.x1], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
         ax.plot([span.x1, span.x2], [span.y2, span.y2], linewidth=linewidth, alpha=alpha, color=color)

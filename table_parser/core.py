@@ -607,7 +607,7 @@ class Table(object):
             x1 = min([cell.x1 for cell in span])
             x2 = max([cell.x2 for cell in span])
             y1 = min([cell.y1 for cell in span])
-            y2 = min([cell.y2 for cell in span])
+            y2 = max([cell.y2 for cell in span])
             self.spans.append(Cell(x1, y1, x2, y2))
 
         return self.spans

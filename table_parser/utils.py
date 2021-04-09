@@ -825,7 +825,7 @@ def get_ocr_layout(
     word_margin=0.1,
     detect_vertical=True,
     all_texts=True,
-    run_ocr=True,
+    run_ocr=False,
 ):
     """
     Return an image layout

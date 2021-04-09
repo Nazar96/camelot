@@ -989,7 +989,7 @@ def derotate_angle(img, left=-3, right=3, n_iter=5, resize_k=0.5):
     return best_angle
 
 
-def get_cells_bbox(table):
+def get_spans(table):
     "Return table's connected components"
     cells = table.cells
 
@@ -1049,14 +1049,15 @@ def draw_lines(image, table, linewidth=5, alpha=0.5):
     return fig
 
 
-def draw_cells(image, conn_comp_bbox, linewidth=5, alpha=0.5):
+def draw_cells(image, span_list, linewidth=5, alpha=0.5):
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    for conn in conn_comp_bbox:
-        ax.plot([conn.x2, conn.x2], [conn.y1, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x1], [conn.y1, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x2], [conn.y2, conn.y2], linewidth=linewidth, alpha=alpha)
-        ax.plot([conn.x1, conn.x2], [conn.y1, conn.y1], linewidth=linewidth, alpha=alpha)
+    for span in span_list:
+        color = np.random.rand(3)
+        ax.plot([span.x2, span.x2], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x1], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x2], [span.y2, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x2], [span.y1, span.y1], linewidth=linewidth, alpha=alpha, color=color)
 
     plt.imshow(image[::-1], origin='lower')
     return fig

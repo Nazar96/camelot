@@ -386,6 +386,7 @@ class Lattice(BaseParser):
         table._image = (self.image, self.table_bbox_unscaled)
         table._segments = (self.vertical_segments, self.horizontal_segments)
         table._textedges = None
+        table.get_span()
 
         return table
 

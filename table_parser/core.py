@@ -6,6 +6,7 @@ import zipfile
 import tempfile
 from itertools import chain
 from operator import itemgetter
+import networkx as nx
 
 import numpy as np
 import pandas as pd
@@ -349,6 +350,7 @@ class Table(object):
         self.whitespace = 0
         self.order = None
         self.page = None
+        self.spans = None
 
     def __repr__(self):
         return "<{} shape={}>".format(self.__class__.__name__, self.shape)
@@ -567,6 +569,48 @@ class Table(object):
                     cell.vspan = True
                     cell.hspan = True
         return self
+
+    def get_span(self):
+        """
+
+        Returns
+        -------
+        List of connected cells.
+        """
+        nodes_list, edges_list = [], []
+        for i, row in enumerate(self.cells):
+            for j, cell in enumerate(row):
+                nodes_list.append((i, j))
+                if cell.right is False:
+                    edges_list.append(((i, j), (i, j + 1)))
+                if cell.left is False:
+                    edges_list.append(((i, j), (i, j - 1)))
+                if cell.top is False:
+                    edges_list.append(((i, j), (i - 1, j)))
+                if cell.bottom is False:
+                    edges_list.append(((i, j), (i + 1, j)))
+
+        G = nx.Graph()
+        G.add_nodes_from(nodes_list)
+        G.add_edges_from(edges_list)
+        span_idx = list(nx.connected_components(G))
+
+        span_cells = []
+        for comp in span_idx:
+            tmp = []
+            for idx in comp:
+                tmp.append(self.cells[idx[0]][idx[1]])
+            span_cells.append(tmp)
+
+        self.spans = []
+        for span in span_cells:
+            x1 = min([cell.x1 for cell in span])
+            x2 = max([cell.x2 for cell in span])
+            y1 = min([cell.y1 for cell in span])
+            y2 = min([cell.y2 for cell in span])
+            self.spans.append(Cell(x1, y1, x2, y2))
+
+        return self.spans
 
     def to_csv(self, path, **kwargs):
         """Writes Table to a comma-separated values (csv) file.

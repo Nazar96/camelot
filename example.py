@@ -6,7 +6,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-img_path = './path_to_image.png'
+img_path = './data/table_1.jpeg'
 
 # Rotate image
 angle = np.random.uniform(-3, 3)

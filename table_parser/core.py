@@ -634,7 +634,8 @@ class Table(object):
             cells = []
             for idx in comp:
                 cells.append(self.cells[idx[0]][idx[1]])
-            self.spans.append(Span(cells=cells))
+            span = Span(cells=cells).set_coord()
+            self.spans.append(span)
 
         return self.spans
 

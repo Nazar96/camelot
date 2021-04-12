@@ -315,15 +315,9 @@ class Span(object):
     """
 
     """
-    def __init__(self, x1=None, y1=None, x2=None, y2=None, cells=[]):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        self.lb = (x1, y1)
-        self.lt = (x1, y2)
-        self.rb = (x2, y1)
-        self.rt = (x2, y2)
+    def __init__(self, cells=[]):
+        self.cells = cells
+        self.set_coord()
         self.left = False
         self.right = False
         self.top = False
@@ -331,7 +325,6 @@ class Span(object):
         self.hspan = False
         self.vspan = False
         self._text = ""
-        self.cells = cells
 
     def set_coord(self):
         self.x1 = min([cell.x1 for cell in self.cells])

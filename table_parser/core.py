@@ -311,6 +311,33 @@ class Cell(object):
         return self.top + self.bottom + self.left + self.right
 
 
+class Span(object):
+    """
+
+    """
+    def __init__(self, cells=[]):
+        self.cells = cells
+        self.set_coord()
+        self.left = False
+        self.right = False
+        self.top = False
+        self.bottom = False
+        self.hspan = False
+        self.vspan = False
+        self._text = ""
+
+    def set_coord(self):
+        self.x1 = min([cell.x1 for cell in self.cells])
+        self.x2 = max([cell.x2 for cell in self.cells])
+        self.y1 = min([cell.y1 for cell in self.cells])
+        self.y2 = max([cell.y2 for cell in self.cells])
+        self.lb = (self.x1, self.y1)
+        self.lt = (self.x1, self.y2)
+        self.rb = (self.x2, self.y1)
+        self.rt = (self.x2, self.y2)
+        return self
+
+
 class Table(object):
     """Defines a table with coordinates relative to a left-bottom
     origin. (PDF coordinate space)
@@ -595,20 +622,13 @@ class Table(object):
         G.add_edges_from(edges_list)
         span_idx = list(nx.connected_components(G))
 
-        span_cells = []
-        for comp in span_idx:
-            tmp = []
-            for idx in comp:
-                tmp.append(self.cells[idx[0]][idx[1]])
-            span_cells.append(tmp)
-
         self.spans = []
-        for span in span_cells:
-            x1 = min([cell.x1 for cell in span])
-            x2 = max([cell.x2 for cell in span])
-            y1 = min([cell.y1 for cell in span])
-            y2 = max([cell.y2 for cell in span])
-            self.spans.append(Cell(x1, y1, x2, y2))
+        for comp in span_idx:
+            cells = []
+            for idx in comp:
+                cells.append(self.cells[idx[0]][idx[1]])
+            span = Span(cells=cells).set_coord()
+            self.spans.append(span)
 
         return self.spans
 

@@ -15,6 +15,10 @@ from operator import itemgetter
 from .layout import PageObj, AttrDict
 import matplotlib.pyplot as plt
 
+from scipy.ndimage.interpolation import rotate
+import cv2
+import networkx as nx
+
 import numpy as np
 # from pdfminer.pdfparser import PDFParser
 # from pdfminer.pdfdocument import PDFDocument
@@ -821,7 +825,7 @@ def get_ocr_layout(
     word_margin=0.1,
     detect_vertical=True,
     all_texts=True,
-    run_ocr=True,
+    run_ocr=False,
 ):
     """
     Return an image layout
@@ -946,3 +950,72 @@ def get_ocr_objects(layout, ltype="char", t=None):
     #     LTObject = LTTextLineVertical
 
     return layout._objs
+
+
+def rotate_custom(img, angle, padding=100):
+    img = img.copy()
+    h, w = img.shape[:2]
+    img = cv2.copyMakeBorder(img, padding, padding, padding, padding, cv2.BORDER_CONSTANT, value=(255, 255, 255))
+    img = rotate(img, angle)
+    h_new, w_new = img.shape[:2]
+    h_padding, w_padding = int((h_new - h) / 2) - 15, int((w_new - w) / 2) - 15
+    img = img[h_padding:-h_padding, w_padding:-w_padding]
+    return img
+
+
+def rotation_score(img, angle):
+    tmp = rotate_custom(img, angle)
+    hist = tmp.mean(axis=1)
+    score = ((hist[1:] - hist[:-1]) ** 2).sum()
+    return score
+
+
+def derotate_angle(img, left=-3, right=3, n_iter=4, resize_k=0.3):
+    h, w = img.shape[:2]
+    tmp = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    tmp = cv2.resize(tmp, (int(w * resize_k), int(h * resize_k)), interpolation=cv2.INTER_AREA)
+
+    v_left, v_right = rotation_score(tmp, left), rotation_score(tmp, right)
+    for _ in range(n_iter):
+        mean = (left + right) / 2
+        if v_left > v_right:
+            right = mean
+            v_right = rotation_score(tmp, right)
+        else:
+            left = mean
+            v_left = rotation_score(tmp, left)
+
+    best_angle = (left + right) / 2
+    return best_angle
+
+
+def draw_lines(image, table, linewidth=5, alpha=0.5):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    for row in table.cells:
+        for cell in row:
+            if cell.left:
+                ax.plot([cell.lb[0], cell.lt[0]], [cell.lb[1], cell.lt[1]], linewidth=linewidth, alpha=alpha)
+            if cell.right:
+                ax.plot([cell.rb[0], cell.rt[0]], [cell.rb[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
+            if cell.top:
+                ax.plot([cell.lt[0], cell.rt[0]], [cell.lt[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
+            if cell.bottom:
+                ax.plot([cell.lb[0], cell.rb[0]], [cell.lb[1], cell.rb[1]], linewidth=linewidth, alpha=alpha)
+    plt.imshow(image[::-1], origin='lower')
+    return fig
+
+
+def draw_cells(image, span_list, linewidth=5, alpha=0.5, color=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    for span in span_list:
+        if color is None:
+            color = np.random.rand(3)
+        ax.plot([span.x2, span.x2], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x1], [span.y1, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x2], [span.y2, span.y2], linewidth=linewidth, alpha=alpha, color=color)
+        ax.plot([span.x1, span.x2], [span.y1, span.y1], linewidth=linewidth, alpha=alpha, color=color)
+
+    plt.imshow(image[::-1], origin='lower')
+    return fig

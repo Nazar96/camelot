@@ -6,6 +6,7 @@ import zipfile
 import tempfile
 from itertools import chain
 from operator import itemgetter
+import networkx as nx
 
 import numpy as np
 import pandas as pd
@@ -310,6 +311,33 @@ class Cell(object):
         return self.top + self.bottom + self.left + self.right
 
 
+class Span(object):
+    """
+
+    """
+    def __init__(self, cells=[]):
+        self.cells = cells
+        self.set_coord()
+        self.left = False
+        self.right = False
+        self.top = False
+        self.bottom = False
+        self.hspan = False
+        self.vspan = False
+        self._text = ""
+
+    def set_coord(self):
+        self.x1 = min([cell.x1 for cell in self.cells])
+        self.x2 = max([cell.x2 for cell in self.cells])
+        self.y1 = min([cell.y1 for cell in self.cells])
+        self.y2 = max([cell.y2 for cell in self.cells])
+        self.lb = (self.x1, self.y1)
+        self.lt = (self.x1, self.y2)
+        self.rb = (self.x2, self.y1)
+        self.rt = (self.x2, self.y2)
+        return self
+
+
 class Table(object):
     """Defines a table with coordinates relative to a left-bottom
     origin. (PDF coordinate space)
@@ -349,6 +377,7 @@ class Table(object):
         self.whitespace = 0
         self.order = None
         self.page = None
+        self.spans = None
 
     def __repr__(self):
         return "<{} shape={}>".format(self.__class__.__name__, self.shape)
@@ -567,6 +596,41 @@ class Table(object):
                     cell.vspan = True
                     cell.hspan = True
         return self
+
+    def get_span(self):
+        """
+
+        Returns
+        -------
+        List of connected cells.
+        """
+        nodes_list, edges_list = [], []
+        for i, row in enumerate(self.cells):
+            for j, cell in enumerate(row):
+                nodes_list.append((i, j))
+                if cell.right is False:
+                    edges_list.append(((i, j), (i, j + 1)))
+                if cell.left is False:
+                    edges_list.append(((i, j), (i, j - 1)))
+                if cell.top is False:
+                    edges_list.append(((i, j), (i - 1, j)))
+                if cell.bottom is False:
+                    edges_list.append(((i, j), (i + 1, j)))
+
+        G = nx.Graph()
+        G.add_nodes_from(nodes_list)
+        G.add_edges_from(edges_list)
+        span_idx = list(nx.connected_components(G))
+
+        self.spans = []
+        for comp in span_idx:
+            cells = []
+            for idx in comp:
+                cells.append(self.cells[idx[0]][idx[1]])
+            span = Span(cells=cells).set_coord()
+            self.spans.append(span)
+
+        return self.spans
 
     def to_csv(self, path, **kwargs):
         """Writes Table to a comma-separated values (csv) file.

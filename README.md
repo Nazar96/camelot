@@ -1,27 +1,3 @@
-<pre>
->>> from camelot.camelot.parsers.lattice import Lattice
->>> from camelot.camelot import plot
->>> 
->>> parser = Lattice()
->>> res = parser.extract_tables(img_path)
->>> print(len(res))
->>> 
->>> try:
->>>   fig = plot(res[0], kind='joint')
->>>   fig.set_size_inches(15,15)
->>>   fig.show()
->>> except:
->>>   pass
->>>   
->>> for t in res:
->>>   print(t.parsing_report)
->>>   fig = plot(t, kind='grid')
->>>   fig.set_size_inches(15,15)
->>>   fig.show()
->>>   display(t.df)
-</pre>
-
-
 <p align="center">
    <img src="https://raw.githubusercontent.com/camelot-dev/camelot/master/docs/_static/camelot.png" width="200">
 </p>

@@ -989,19 +989,21 @@ def derotate_angle(img, left=-3, right=3, n_iter=4, resize_k=0.3):
     return best_angle
 
 
-def draw_lines(image, table, linewidth=5, alpha=0.5, draw_image=True):
+def draw_lines(image, table, linewidth=5, alpha=0.5, draw_image=True, color=None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     for row in table.cells:
         for cell in row:
+            if color is None:
+                color = np.random.rand(3)
             if cell.left:
-                ax.plot([cell.lb[0], cell.lt[0]], [cell.lb[1], cell.lt[1]], linewidth=linewidth, alpha=alpha)
+                ax.plot([cell.lb[0], cell.lt[0]], [cell.lb[1], cell.lt[1]], linewidth=linewidth, alpha=alpha, color=color)
             if cell.right:
-                ax.plot([cell.rb[0], cell.rt[0]], [cell.rb[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
+                ax.plot([cell.rb[0], cell.rt[0]], [cell.rb[1], cell.rt[1]], linewidth=linewidth, alpha=alpha, color=color)
             if cell.top:
-                ax.plot([cell.lt[0], cell.rt[0]], [cell.lt[1], cell.rt[1]], linewidth=linewidth, alpha=alpha)
+                ax.plot([cell.lt[0], cell.rt[0]], [cell.lt[1], cell.rt[1]], linewidth=linewidth, alpha=alpha, color=color)
             if cell.bottom:
-                ax.plot([cell.lb[0], cell.rb[0]], [cell.lb[1], cell.rb[1]], linewidth=linewidth, alpha=alpha)
+                ax.plot([cell.lb[0], cell.rb[0]], [cell.lb[1], cell.rb[1]], linewidth=linewidth, alpha=alpha, color=color)
     if draw_image:
         plt.imshow(image[::-1], origin='lower')
     return fig
